@@ -11,4 +11,7 @@ and run the server with
 `nodemon main.js`
 
 # Database
-You need to connect to a mysql/mariadb server. You can launch your own and specify the connection details in `settings/user.json`, or change the default settings in `settings/default.json`.
+You need to connect to a mysql/mariadb server. You can launch your own and specify the connection details in the settings.
+
+# Settings
+The default settings are in `settings/default.json` do not change them. Instead, create a `settings/user.json` and overwrite the settings you wish to change.
