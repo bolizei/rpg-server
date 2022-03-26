@@ -1,7 +1,7 @@
 import player from './player.js'
 import level from './level.js'
 import settings from '../settings/settings.js'
-import logger from './logger.js'
+import logger from '../lib/logger.js'
 import express from 'express'
 import http from 'http'
 import {Server} from 'socket.io'
@@ -15,8 +15,8 @@ const log = new logger()
 
 export default class gameserver {
     constructor(s) {
+        console.log('#######################################')        
         this._settings = new settings(s)        
-        console.log('#######################################')
         log.log(0, 'starting server')
         this.setupNetwork()
         this.setupDatabase()
