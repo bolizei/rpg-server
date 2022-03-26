@@ -1,12 +1,13 @@
 import player from './player.js'
 import level from './level.js'
-import settings from '../settings/settings.js'
+import settings from './settings.js'
 import logger from '../lib/logger.js'
 import express from 'express'
 import http from 'http'
 import {Server} from 'socket.io'
 import mysql from 'mysql'
 import os from 'os'
+import fs from 'fs'
 
 // todo: rewrite logger
 const log = new logger()
@@ -20,9 +21,22 @@ export default class gameserver {
         log.log(0, 'starting server')
         this.setupNetwork()
         this.setupDatabase()
+        this.loadResources()
         this.players = []
         this.levels = []
+        
     }
+
+    loadResources() {
+        this._resources = {}
+        try {
+            // load resource files here
+        } catch(error) {
+            log.log(0, 'Error: could not load resources', error.error)
+        }
+    }
+
+
 
     getNetworkInterface() {
         const nets = os.networkInterfaces()
@@ -85,6 +99,7 @@ export default class gameserver {
         let newplayer = new player('anon', socket)
         newplayer.connected = true            
         this.setupPlayerNetworkHandlers(newplayer)    
+        socket.emit('d', {method: 'game'})
     }
 
     setupPlayerNetworkHandlers(player) {
@@ -104,6 +119,7 @@ export default class gameserver {
             log.log(-1, 'login',  player.socket.id, data)
             this.loginUser(player, data.name, data.hash)
         })       
+        // todo: refactor into proper user pool
         player.socket.on('disconnect', (...data) => {
             log.log(-1, 'disonnect',  player.socket.id, ...data)
             this.removePlayerFromPool(player)
@@ -121,13 +137,15 @@ export default class gameserver {
             values = {'name': player.name}
         } else if(data.subject == 'ownstate') {
             values = {'state': 'default'}
-        } 
+        }
 
         player.socket.emit('d', {
             'subject': data.subject,
             'values': values
         })
     }
+
+
 
     handleData(player, data) {
         if(data.action == 'request') 
@@ -138,6 +156,9 @@ export default class gameserver {
             log.log(0, 'error', 'datapackage not correctly formed. missing method', data)
     }
 
+    handleDataPush() {
+        
+    }
 
     // already callback hell
     // need to refactor this anyway

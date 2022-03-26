@@ -5,7 +5,7 @@ const log = new logger()
 
 export default class settings {
     constructor(s) {
-        let setting = {}
+        let settings = {}
 
         // load setting/default.json
         try {
