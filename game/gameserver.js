@@ -1,17 +1,20 @@
 import player from './player.js'
 import level from './level.js'
-import settings from './settings.js'
+import settings from '../settings/settings.js'
 import logger from './logger.js'
 import express from 'express'
 import http from 'http'
 import {Server} from 'socket.io'
 import mysql from 'mysql'
 import os from 'os'
-
+// todo: rewrite logger
 const log = new logger()
 
+// todo: extract network module
+
 export default class gameserver {
-    constructor() {
+    constructor(s) {
+        this._settings = new settings(s)        
         console.log('#######################################')
         log.log(0, 'starting server')
         this.setupNetwork()
@@ -32,18 +35,18 @@ export default class gameserver {
         }
 
         // settings defines which ethernet adapter we are using
-        settings.ip_address = results[settings.ethernet_adapter]
-        log.log(0, 'selecting ethernet adapter', settings.ethernet_adapter, settings.ip_address)
+        this._settings.ip_address = results[this._settings.ethernet_adapter]
+        log.log(0, 'selecting ethernet adapter', this._settings.ethernet_adapter, this._settings.ip_address)
         // todo: fallback if wrong selection
     }
 
     setupDatabase() {
         log.log(0, 'connecting to database')
         this.connection = mysql.createConnection({
-            host: settings.sql.host,
-            user: settings.sql.user,
-            password: settings.sql.password,
-            database: settings.sql.database
+            host: this._settings.sql.host,
+            user: this._settings.sql.user,
+            password: this._settings.sql.password,
+            database: this._settings.sql.database
         })
         this.connection.connect((error) => {
             if(error)
@@ -61,11 +64,11 @@ export default class gameserver {
         this.httpserver = http.createServer(this.app)
         this.socketserver = new Server(this.httpserver, {
             cors: {
-                origin: 'http://' + settings.ip_address + ':8080'
+                origin: 'http://' + this._settings.ip_address + ':8080'
             }
         })
-        this.httpserver.listen(settings.listen_port, () => {
-            log.log(0, 'server is listening on', settings.ip_address + ':' + settings.listen_port)
+        this.httpserver.listen(this._settings.listen_port, () => {
+            log.log(0, 'server is listening on', this._settings.ip_address + ':' + this._settings.listen_port)
         })
         this.setupNetworkHandlers()
     }
