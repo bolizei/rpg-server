@@ -4,8 +4,8 @@ export default {
         host: 'localhost',
         port: 667,
         user: 'root',
-        password: '',
+        password: 'pornopeter',
         database: 'rpg'
     },
-    ethernet_adapter: 1
+    ethernet_adapter: 0
 }

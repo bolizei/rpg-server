@@ -34,6 +34,7 @@ export default class gameserver {
         // settings defines which ethernet adapter we are using
         settings.ip_address = results[settings.ethernet_adapter]
         log.log(0, 'selecting ethernet adapter', settings.ethernet_adapter, settings.ip_address)
+        // todo: fallback if wrong selection
     }
 
     setupDatabase() {
@@ -60,7 +61,7 @@ export default class gameserver {
         this.httpserver = http.createServer(this.app)
         this.socketserver = new Server(this.httpserver, {
             cors: {
-                origin: 'http://172.30.120.2:8080'
+                origin: 'http://' + settings.ip_address + ':8080'
             }
         })
         this.httpserver.listen(settings.listen_port, () => {
